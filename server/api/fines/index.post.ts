@@ -2,12 +2,13 @@ import prisma from "~/server/database/client";
 
 export default defineEventHandler(async (event) => {
     const body = await readBody(event)
+    console.log(body)
     prisma.fine.create({
         data: {
-            car: body.car,
-            fineType: body.fineType,
             date: body.date,
+            car: body.car,
             carId: body.carId,
+            fineType: body.fineType,
             fineTypeId: body.fineTypeId
         },
     })
