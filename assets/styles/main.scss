@@ -1,0 +1,23 @@
+@import "nullstyle";
+@import "variables";
+
+.subtitle {
+  font-size: var(--fs-subtitle);
+  color: var(--font-subtitle-color);
+}
+
+.title {
+  font-size: var(--fs-title);
+  color: var(--font-title-color);
+}
+
+.small {
+  font-size: var(--fs-label);
+  color: var(--font-title-color);
+}
+
+.logo {
+  font-family: "Passero One", sans-serif;
+  font-size: 3rem;
+  color: var(--primary-color);
+}
