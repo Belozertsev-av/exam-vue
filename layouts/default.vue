@@ -20,7 +20,7 @@ const route = useRoute()
 
 const title = computed(() => {
   if (route.path === "/") return "Все штрафы"
-  else if (route.path === "/edit") return "Оформление нового щтрафа"
+  else if (route.path === "/edit") return "Оформление нового штрафа"
   else if (route.path === `/edit/${route.params.id}`) return `Редактирование штрафа № ${route.params.id}`
 })
 

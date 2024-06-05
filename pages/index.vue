@@ -47,10 +47,10 @@
             </div>
           </template>
           <v-card-actions>
-            <v-btn class="btn" elevation="2" :to="`edit/${item.id}`">
+            <v-btn class="btn" elevation="2" @click="navigateToIdPage(item)">
               Редактировать
             </v-btn>
-            <v-btn class="btn" color="red" @click="deleteFine(item.id)">Удалить</v-btn>
+            <v-btn class="btn" variant="tonal" color="red" @click="deleteFine(item.id)">Удалить</v-btn>
           </v-card-actions>
         </v-card>
       </template>
@@ -82,8 +82,9 @@ const isModalOpen = ref<boolean>(false)
 const answer = ref({})
 
 const deleteFine = async (id: number) => {
-
   answer.value = await deleteFineById(id).then(response => response?.data.value) ?? {}
+  fines.value = []
+  fines.value = await getAllFines() ?? []
   isModalOpen.value = true
 }
 
@@ -92,6 +93,19 @@ const search = debounce(() => {
     filtratedFines.value = fines.value.filter(it => it.car?.number.toLowerCase().includes(liveSearch.value!.toLowerCase()))
   } else filtratedFines.value = fines.value
 }, 500)
+
+const navigateToIdPage = (item: IFine) => {
+  navigateTo({
+    path: `edit/${item.id}`,
+    query: {
+      car: (item.car?.number + ' ' + item.car?.name) as string,
+      carId: item.car?.id,
+      fineTypeId: item.fineType?.id,
+      fineType: (item.fineType?.fine) as string,
+      date: item.date.toString(),
+    }
+  })
+}
 </script>
 
 <style lang="scss" scoped>

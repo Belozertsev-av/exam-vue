@@ -1,18 +1,20 @@
-import vuetify, { transformAssetUrls } from 'vite-plugin-vuetify'
+import vuetify, {transformAssetUrls} from 'vite-plugin-vuetify'
 
 export default defineNuxtConfig({
     build: {
         transpile: ['vuetify'],
     },
+    ssr: false,
     modules: [
         (_options, nuxt) => {
-        nuxt.hooks.hook('vite:extendConfig', (config) => {
-            // @ts-ignore
-            config.plugins.push(vuetify({ autoImport: true }))
-        })
-    },
+            nuxt.hooks.hook('vite:extendConfig', (config) => {
+                // @ts-ignore
+                config.plugins.push(vuetify({autoImport: true}))
+            })
+        },
         '@pinia/nuxt',
-        '@nuxtjs/color-mode'
+        '@nuxtjs/color-mode',
+        '@vee-validate/nuxt'
     ],
     vite: {
         vue: {
