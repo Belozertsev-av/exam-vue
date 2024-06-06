@@ -16,5 +16,4 @@
 ![use-case drawio](https://github.com/Belozertsev-av/exam-vue/assets/65508634/37649a0d-e0fc-40fa-9e10-75b480e7ef63)
 
 
-![use-case drawio](https://github.com/Belozertsev-av/exam-vue/assets/65508634/97abf657-6ba4-42ac-a03c-44c15e1c1f45)
-
+![db_diagram drawio](https://github.com/Belozertsev-av/exam-vue/assets/65508634/1b0c7ab3-6e17-40b0-83c8-5a3dcb25afa4)
