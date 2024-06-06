@@ -55,13 +55,13 @@ const route = useRoute()
 const routeProps = route.query as {
   car: string,
   fineType: string,
-  date: Date | null
+  date: string | null
 }
 
-const {state, updateFines, addFine} = useFine()
+const {state, addFine} = useFine()
 const car = ref<string>((routeProps.car) ? routeProps.car : "")
 const fineType = ref<string>((routeProps.fineType) ? routeProps.fineType : "")
-const date = ref<Date | null>((routeProps.date) ? routeProps.date : null)
+const date = ref<string | null>((routeProps.date) ? routeProps.date : null)
 
 const carItems = computed(() => {
   return props.cars.map(it => it.number + " " + it.name)
@@ -75,13 +75,13 @@ const submit = async () => {
     await updateFineById(Number(route.params.id), {
       car: props.cars.find(it => it.number + " " + it.name === car.value),
       fineType: props.fines.find(it => it.fine === fineType.value),
-      date: date.value?.toDateString(),
+      date: date.value!,
       carId: props.cars.find(it => it.number + " " + it.name === car.value)?.id,
       fineTypeId: props.fines.find(it => it.fine === fineType.value)?.id
     })
   } else {
     await addFine({
-      date: date.value?.toDateString()!,
+      date: date.value!,
       car: props.cars.find(it => it.number + " " + it.name === car.value)!,
       carId: props.cars.find(it => it.number + " " + it.name === car.value)?.id!,
       fineType: props.fines.find(it => it.fine === fineType.value)!,
