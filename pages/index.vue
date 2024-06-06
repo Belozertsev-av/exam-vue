@@ -50,7 +50,7 @@
             <v-btn class="btn" elevation="2" @click="navigateToIdPage(item)">
               Редактировать
             </v-btn>
-            <v-btn class="btn" variant="tonal" color="red" @click="store.deleteFine(item.id)">Удалить</v-btn>
+            <v-btn class="btn" variant="tonal" color="red" @click="deleteFine(item.id)">Удалить</v-btn>
           </v-card-actions>
         </v-card>
       </template>
