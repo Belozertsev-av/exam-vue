@@ -14,20 +14,12 @@ model FineType {
   Fine   Fine[]
 }
 
-model Owner {
-  id        Int    @id @default(autoincrement())
-  firstName String
-  lastName  String
-  Car       Car[]
-}
-
 model Car {
-  id      Int    @id @default(autoincrement())
-  number  String @db.VarChar(6)
-  name    String
-  owner   Owner  @relation(fields: [ownerId], references: [id])
-  ownerId Int
-  Fine    Fine[]
+  id        Int    @id @default(autoincrement())
+  number    String @db.VarChar(6)
+  name      String
+  ownerName String
+  Fine      Fine[]
 }
 
 model Fine {
