@@ -5,11 +5,13 @@
           v-model="liveSearch"
           append-inner-icon="mdi-magnify"
           density="compact"
-          label="Начните вводить номер машины"
+          label="Введите период в формате 11.11.2011 - 22.11.2011"
           variant="solo"
           hide-details
           single-line
-          @input="search"
+          clearable
+          @keyup.enter="search"
+          @click:clear="search"
           @click:append-inner="search"
       ></v-text-field>
       <v-btn class="btn-top" elevation="2" to="edit">
@@ -21,7 +23,7 @@
       <p class="message-text">{{ answer.text }}</p>
       <VIcon @click="isModalOpen = false" icon="mdi-window-close"/>
     </v-card>
-    <div class="page-title">Штрафы:</div>
+    <div class="page-title">Нарушения:</div>
     <v-data-iterator :items="filtratedItems" :page="page" :items-per-page="itemsPerPage">
       <template
           v-for="item in filtratedItems"
@@ -66,7 +68,6 @@
 
 <script lang="ts" setup>
 import {ref} from 'vue'
-import {debounce} from "perfect-debounce";
 import {useStore} from "~/stores/useStore";
 import type {ICar, IFine, IFineType} from "~/model/types";
 
@@ -89,11 +90,27 @@ const deleteFine = async (id: number) => {
   isModalOpen.value = true
 }
 
-const search = debounce(() => {
+const search = () => {
   if (liveSearch.value) {
-    filtratedItems.value = items.value.filter(it => it.date.toLowerCase().includes(liveSearch.value!.toLowerCase()))
-  } else filtratedItems.value = items.value
-}, 500)
+    const periods = liveSearch.value.split(" - ", 2)
+
+    const periodsFrom: string[] = periods[0].split('.', 3)
+    const periodsTo: string[] = periods[1].split('.', 3)
+
+    const dateFrom = new Date(Number(periodsFrom[2]), Number(periodsFrom[1]), Number(periodsFrom[0]))
+    const dateTo = new Date(Number(periodsTo[2]), Number(periodsTo[1]), Number(periodsTo[0]))
+
+    filtratedItems.value = items.value.filter(item => {
+      const currentDate = item.date.split('.', 3)
+      const date = new Date(Number(currentDate[2]), Number(currentDate[1]), Number(currentDate[0]))
+
+      console.log(date, dateTo, dateFrom)
+      if (date < dateTo && date > dateFrom) return item
+    })
+  } else {
+    filtratedItems.value = items.value
+  }
+}
 
 const navigateToIdPage = (item: IFine) => {
   navigateTo({
