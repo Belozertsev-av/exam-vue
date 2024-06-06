@@ -12,16 +12,10 @@
         label="Тип штрафа"
     ></v-select>
 
-    <v-menu :close-on-content-click="true">
-      <template v-slot:activator="{ props }">
-        <v-text-field readonly v-model="date" :value="date" v-bind="props" label="Дата оформления"
-                      variant="solo" class="sorting__search-to" append-inner-icon="mdi mdi-calendar-blank">
-        </v-text-field>
-      </template>
-      <v-date-picker v-model="date" color="#03c58e">
-      </v-date-picker>
-    </v-menu>
-
+    <v-text-field
+        v-model="date"
+        label="Введите дату в формате 11.11.2011">
+    </v-text-field>
     <v-btn
         class="form__btn me-4"
         type="submit"
@@ -36,64 +30,49 @@
 </template>
 
 <script setup lang="ts">
-import {type PropType, ref} from 'vue'
-import {updateFineById} from "~/model/endpoints";
+import {useStore} from "~/stores/useStore";
 import type {ICar, IFineType} from "~/model/types";
-import {useFine} from "~/stores/useUser";
 
-const props = defineProps({
-  cars: {
-    type: Object as PropType<ICar[]>,
-    required: true,
-  },
-  fines: {
-    type: Object as PropType<IFineType[]>,
-    required: true,
-  }
-})
+const store = useStore()
 const route = useRoute()
-const routeProps = route.query as {
-  car: string,
-  fineType: string,
-  date: string | null
-}
+const routeProps = ref(store.getFineById(Number(route.params.id)) ?? null)
+console.log(routeProps.value)
 
-const {state, addFine} = useFine()
-const car = ref<string>((routeProps.car) ? routeProps.car : "")
-const fineType = ref<string>((routeProps.fineType) ? routeProps.fineType : "")
-const date = ref<string | null>((routeProps.date) ? routeProps.date : null)
+const cars = ref<ICar[]>(store.getCars() as ICar[] ?? [])
+const fines = ref<IFineType[]>(store.getFineTypes() as IFineType[] ?? [])
+
+
+const car = ref<string>((routeProps.value) ? routeProps.value.car!.number + ' ' + routeProps.value.car!.name : "")
+const fineType = ref<string>((routeProps.value) ? routeProps.value.fineType!.fine : "")
+const date = ref<string>((routeProps.value) ? routeProps.value.date : "")
 
 const carItems = computed(() => {
-  return props.cars.map(it => it.number + " " + it.name)
+  return cars.value.map(it => it.number + " " + it.name)
 })
 const fineTypeItems = computed(() => {
-  return props.fines.map(it => it.fine)
+  return fines.value.map(it => it.fine)
 })
 
-const submit = async () => {
-  if (route.path === `/edit/${route.params.id}`) {
-    await updateFineById(Number(route.params.id), {
-      car: props.cars.find(it => it.number + " " + it.name === car.value),
-      fineType: props.fines.find(it => it.fine === fineType.value),
-      date: date.value!,
-      carId: props.cars.find(it => it.number + " " + it.name === car.value)?.id,
-      fineTypeId: props.fines.find(it => it.fine === fineType.value)?.id
-    })
-  } else {
-    await addFine({
-      date: date.value!,
-      car: props.cars.find(it => it.number + " " + it.name === car.value)!,
-      carId: props.cars.find(it => it.number + " " + it.name === car.value)?.id!,
-      fineType: props.fines.find(it => it.fine === fineType.value)!,
-      fineTypeId: props.fines.find(it => it.fine === fineType.value)?.id!
-    })
-  }
+const submit = () => {
+  if (route.path !== `/edit`) store.editFine(routeProps.value.id, {
+    id: routeProps.value.id,
+    date: date.value,
+    car: cars.value.find(it => (it.number + " " + it.name) === car.value)!,
+    fineType: fines.value.find(it => it.fine === fineType.value)!
+  })
+  else store.addFine({
+    id: store.getLastIndexOfFine() + 1,
+    date: date.value,
+    car: cars.value.find(it => (it.number + " " + it.name) === car.value)!,
+    fineType: fines.value.find(it => it.fine === fineType.value)!
+  })
+
   navigateTo("/")
 }
 const reset = () => {
   car.value = ""
   fineType.value = ""
-  date.value = null
+  date.value = ""
 }
 </script>
 

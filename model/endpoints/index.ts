@@ -36,7 +36,7 @@ export const deleteFineById = async (id: number) => {
 
 export const updateFineById = async (id: number, body: object) => {
     try {
-        await useFetch<Object>(`/api/fines/${id}`, {
+        await $fetch(`/api/fines/${id}`, {
             method: "PATCH",
             body: body,
         })
@@ -47,7 +47,7 @@ export const updateFineById = async (id: number, body: object) => {
 
 export const createFine = async (body: object) => {
     try {
-        await useFetch(`/api/fines`, {
+        await $fetch(`/api/fines`, {
             method: 'POST',
             body: body
         })

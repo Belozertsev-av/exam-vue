@@ -22,23 +22,23 @@
       <VIcon @click="isModalOpen = false" icon="mdi-window-close"/>
     </v-card>
     <div class="page-title">Штрафы:</div>
-    <v-data-iterator :items="filtratedFines" :page="page" :items-per-page="itemsPerPage">
+    <v-data-iterator :items="filtratedItems" :page="page" :items-per-page="itemsPerPage">
       <template
-          v-for="item in filtratedFines"
+          v-for="item in filtratedItems"
           :key="item.id"
       >
         <v-card class="card" elevation="4">
           <template v-slot:title>
-            {{ (item.car as ICar).owner.firstName + ' ' + (item.car as ICar).owner.lastName }}
+            {{ (item.car as ICar).number }}
           </template>
           <template v-slot:subtitle>
-            {{ item.date }}
+            {{ (item.car as ICar).ownerName }}
           </template>
           <template v-slot:text>
             <div class="blocks">
               <div class="block">
                 <p>Машина: {{ (item.car as ICar).name }}</p>
-                <p>Номер машины: <span class="bold">{{ (item.car as ICar).number }}</span></p>
+                <p>Дата нарушения: <span class="bold">{{ item.date }}</span></p>
               </div>
               <div class="block">
                 <p>Нарушение: {{ (item.fineType as IFineType).fine }}</p>
@@ -50,63 +50,54 @@
             <v-btn class="btn" elevation="2" @click="navigateToIdPage(item)">
               Редактировать
             </v-btn>
-            <v-btn class="btn" variant="tonal" color="red" @click="deleteFine(item.id!)">Удалить</v-btn>
+            <v-btn class="btn" variant="tonal" color="red" @click="store.deleteFine(item.id)">Удалить</v-btn>
           </v-card-actions>
         </v-card>
       </template>
     </v-data-iterator>
-    <v-pagination :length="filtratedFines.length / itemsPerPage"
+    <v-pagination :length="filtratedItems.length / itemsPerPage"
                   v-model="page"
                   @next="page++"
                   @prev="page--"
                   @first="1"
-                  @last="filtratedFines.length / itemsPerPage"></v-pagination>
+                  @last="filtratedItems.length / itemsPerPage"></v-pagination>
   </div>
 </template>
 
 <script lang="ts" setup>
 import {ref} from 'vue'
-import {deleteFineById, getAllFines} from "~/model/endpoints";
-import type {ICar, IFine, IFineType} from "~/model/types";
 import {debounce} from "perfect-debounce";
-import {useFine} from "~/stores/useUser";
+import {useStore} from "~/stores/useStore";
+import type {ICar, IFine, IFineType} from "~/model/types";
 
-const {state} = useFine()
+const store = useStore()
 
 const page = ref(1)
 const itemsPerPage = ref(5)
-const fines = ref<IFine[]>(state)
+const items = ref<IFine[]>(store.getFines() ?? [])
+const filtratedItems = ref<IFine[]>(items.value)
 
-
-const filtratedFines = ref<IFine[]>(fines.value)
 const liveSearch = ref<string | null>(null)
 
 const isModalOpen = ref<boolean>(false)
 const answer = ref({})
 
 const deleteFine = async (id: number) => {
-  answer.value = await deleteFineById(id).then(response => response?.data.value) ?? {}
-  fines.value = []
-  fines.value = await getAllFines() ?? []
+  answer.value = store.deleteFine(id)
+  items.value = []
+  items.value = store.getFines() ?? []
   isModalOpen.value = true
 }
 
 const search = debounce(() => {
   if (liveSearch.value) {
-    filtratedFines.value = fines.value.filter(it => it.car?.number.toLowerCase().includes(liveSearch.value!.toLowerCase()))
-  } else filtratedFines.value = fines.value
+    filtratedItems.value = items.value.filter(it => it.date.toLowerCase().includes(liveSearch.value!.toLowerCase()))
+  } else filtratedItems.value = items.value
 }, 500)
 
 const navigateToIdPage = (item: IFine) => {
   navigateTo({
     path: `edit/${item.id}`,
-    query: {
-      car: (item.car?.number + ' ' + item.car?.name) as string,
-      carId: item.car?.id,
-      fineTypeId: item.fineType?.id,
-      fineType: (item.fineType?.fine) as string,
-      date: item.date,
-    }
   })
 }
 </script>
