@@ -13,7 +13,10 @@
 <script setup lang="ts">
 import {ref} from "vue";
 import type {ICar, IFineType} from "~/model/types";
-import {getAllCars, getAllFineTypes} from "~/model/endpoints";
+import {getAllCars, getAllFineTypes} from "~/model/endpoints"
+
+const EditForm = () => import('~/components/edit-form.vue')
+
 
 const cars = ref<ICar[]>(await getAllCars() ?? [])
 const fines = ref<IFineType[]>(await getAllFineTypes() ?? [])

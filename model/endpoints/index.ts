@@ -47,7 +47,7 @@ export const updateFineById = async (id: number, body: object) => {
 
 export const createFine = async (body: object) => {
     try {
-        await $fetch(`/api/fines`, {
+        await useFetch(`/api/fines`, {
             method: 'POST',
             body: body
         })

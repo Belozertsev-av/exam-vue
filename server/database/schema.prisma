@@ -32,7 +32,7 @@ model Car {
 
 model Fine {
   id         Int      @id @default(autoincrement())
-  date       DateTime
+  date       String
   car        Car      @relation(fields: [carId], references: [id], onDelete: Cascade)
   carId      Int
   fineType   FineType @relation(fields: [fineTypeId], references: [id], onDelete: Cascade)

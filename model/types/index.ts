@@ -1,8 +1,10 @@
 export interface IFine {
-    id: number
-    date: Date
+    id?: number
+    date: string
     car: ICar | null
-    fineType: IFineType | null
+    carId: number
+    fineType: IFineType | null,
+    fineTypeId: number,
 }
 
 export interface IFineType {

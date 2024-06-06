@@ -50,7 +50,7 @@
             <v-btn class="btn" elevation="2" @click="navigateToIdPage(item)">
               Редактировать
             </v-btn>
-            <v-btn class="btn" variant="tonal" color="red" @click="deleteFine(item.id)">Удалить</v-btn>
+            <v-btn class="btn" variant="tonal" color="red" @click="deleteFine(item.id!)">Удалить</v-btn>
           </v-card-actions>
         </v-card>
       </template>
@@ -69,10 +69,13 @@ import {ref} from 'vue'
 import {deleteFineById, getAllFines} from "~/model/endpoints";
 import type {ICar, IFine, IFineType} from "~/model/types";
 import {debounce} from "perfect-debounce";
+import {useFine} from "~/stores/useUser";
+
+const {state} = useFine()
 
 const page = ref(1)
 const itemsPerPage = ref(5)
-const fines = ref<IFine[]>(await getAllFines() ?? [])
+const fines = ref<IFine[]>(state)
 
 
 const filtratedFines = ref<IFine[]>(fines.value)
@@ -102,7 +105,7 @@ const navigateToIdPage = (item: IFine) => {
       carId: item.car?.id,
       fineTypeId: item.fineType?.id,
       fineType: (item.fineType?.fine) as string,
-      date: item.date.toString(),
+      date: item.date,
     }
   })
 }

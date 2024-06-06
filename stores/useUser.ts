@@ -1,17 +1,23 @@
 import {defineStore} from 'pinia'
+import type {IFine} from "~/model/types";
+import {createFine, getAllFines} from "~/model/endpoints";
 
-export const useUser = defineStore('user', () => {
-    const state = reactive(<IUser>{
-        id: 0,
-        login: "petya",
-        password: "123"
-    })
+export const useFine = defineStore('fine', () => {
+    const state = reactive(<IFine[]>[]
+    )
 
-    const getUserPassword = computed(() => state.password)
+    const updateFines = async () => {
+        state.splice(0, state.length)
+        const fines = await getAllFines()
+        if (fines) fines.forEach(it => state.push(it))
+    }
+    updateFines()
 
-    function cryptPassword() {
-        return state.password + "123"
+    const addFine = async (newFine: IFine) => {
+        await createFine(newFine)
+        state.push(newFine)
     }
 
-    return {state, getUserPassword, cryptPassword}
+
+    return {state, addFine}
 })

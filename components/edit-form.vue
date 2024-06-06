@@ -12,13 +12,13 @@
         label="Тип штрафа"
     ></v-select>
 
-    <v-menu :close-on-content-click="false">
+    <v-menu :close-on-content-click="true">
       <template v-slot:activator="{ props }">
         <v-text-field readonly v-model="date" :value="date" v-bind="props" label="Дата оформления"
                       variant="solo" class="sorting__search-to" append-inner-icon="mdi mdi-calendar-blank">
         </v-text-field>
       </template>
-      <v-date-picker v-model="date" color="#1f93ff">
+      <v-date-picker v-model="date" color="#03c58e">
       </v-date-picker>
     </v-menu>
 
@@ -37,8 +37,9 @@
 
 <script setup lang="ts">
 import {type PropType, ref} from 'vue'
-import {createFine, updateFineById} from "~/model/endpoints";
+import {updateFineById} from "~/model/endpoints";
 import type {ICar, IFineType} from "~/model/types";
+import {useFine} from "~/stores/useUser";
 
 const props = defineProps({
   cars: {
@@ -56,6 +57,8 @@ const routeProps = route.query as {
   fineType: string,
   date: Date | null
 }
+
+const {state, updateFines, addFine} = useFine()
 const car = ref<string>((routeProps.car) ? routeProps.car : "")
 const fineType = ref<string>((routeProps.fineType) ? routeProps.fineType : "")
 const date = ref<Date | null>((routeProps.date) ? routeProps.date : null)
@@ -70,19 +73,19 @@ const fineTypeItems = computed(() => {
 const submit = async () => {
   if (route.path === `/edit/${route.params.id}`) {
     await updateFineById(Number(route.params.id), {
-      car: car.value,
-      fineType: fineType.value,
-      date: date.value,
+      car: props.cars.find(it => it.number + " " + it.name === car.value),
+      fineType: props.fines.find(it => it.fine === fineType.value),
+      date: date.value?.toDateString(),
       carId: props.cars.find(it => it.number + " " + it.name === car.value)?.id,
       fineTypeId: props.fines.find(it => it.fine === fineType.value)?.id
     })
   } else {
-    await createFine({
-      date: date.value,
-      car: car.value,
-      carId: props.cars.find(it => it.number + " " + it.name === car.value)?.id,
-      fineType: fineType.value,
-      fineTypeId: props.fines.find(it => it.fine === fineType.value)?.id
+    await addFine({
+      date: date.value?.toDateString()!,
+      car: props.cars.find(it => it.number + " " + it.name === car.value)!,
+      carId: props.cars.find(it => it.number + " " + it.name === car.value)?.id!,
+      fineType: props.fines.find(it => it.fine === fineType.value)!,
+      fineTypeId: props.fines.find(it => it.fine === fineType.value)?.id!
     })
   }
   navigateTo("/")
